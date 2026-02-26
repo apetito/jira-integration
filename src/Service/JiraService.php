@@ -25,11 +25,45 @@ class JiraService
 
     public function createIssue(string $projectKey, string $summary, string $description, string $issueType = 'Task'): array
     {
+        return $this->createIssueFromInput([
+            'project_key' => $projectKey,
+            'summary' => $summary,
+            'description_text' => $description,
+            'issue_type' => $issueType,
+        ]);
+    }
+
+    public function createIssueFromInput(array $jiraIssueInput, ?string $projectKeyOverride = null): array
+    {
+        $projectKey = $projectKeyOverride ?? (string) ($jiraIssueInput['project_key'] ?? '');
+        $summary = (string) ($jiraIssueInput['summary'] ?? '');
+
+        if ($projectKey === '' || $summary === '') {
+            throw new \InvalidArgumentException('Fields "project_key" and "summary" are required to create a Jira issue.');
+        }
+
+        $issueType = (string) ($jiraIssueInput['issue_type'] ?? 'Task');
+        $description = (string) ($jiraIssueInput['description_text'] ?? '');
+
         $issueField = new IssueField();
         $issueField->setProjectKey($projectKey)
             ->setSummary($summary)
-            ->setDescription($description)
-            ->setIssueType($issueType);
+            ->setIssueTypeAsString($issueType)
+            ->setDescription($description);
+
+        $priority = $jiraIssueInput['priority'] ?? null;
+        if (is_string($priority) && $priority !== '') {
+            $issueField->setPriorityNameAsString($priority);
+        }
+
+        $labels = $jiraIssueInput['labels'] ?? [];
+        if (is_array($labels)) {
+            foreach ($labels as $label) {
+                if (is_string($label) && $label !== '') {
+                    $issueField->addLabelAsString($label);
+                }
+            }
+        }
 
         $issueService = new IssueService($this->config);
         $issue = $issueService->create($issueField);
