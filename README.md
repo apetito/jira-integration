@@ -65,6 +65,52 @@ php bin/console app:jira:import-tasks
 4. Exibe uma tabela com `external_id`, chave Jira criada e status por item.
 5. Finaliza com total de processados, sucesso e falhas.
 
+#### Exemplo de JSON para criar tasks
+
+Estrutura recomendada dentro de `public/JSON`:
+
+```text
+public/JSON/
+|- create-order.json
+`- issues/
+   |- task-001.json
+   `- task-002.json
+```
+
+`create-order.json`:
+
+```json
+{
+  "create_sequence": [
+    {
+      "external_id": "TASK-001",
+      "payload_file": "issues/task-001.json"
+    },
+    {
+      "external_id": "TASK-002",
+      "payload_file": "issues/task-002.json"
+    }
+  ]
+}
+```
+
+Exemplo de payload em `public/JSON/issues/task-001.json`:
+
+```json
+{
+  "jira_issue_input": {
+    "project_key": "PROJ",
+    "summary": "Implementar endpoint de pagamento",
+    "issue_type": "Task",
+    "description_text": "Criar endpoint POST /payments com validacoes e testes.",
+    "priority": "Medium",
+    "labels": ["backend", "api", "payments"]
+  }
+}
+```
+
+> Dica: se `payload_file` nao for informado, o command tenta usar `public/JSON/issues/<external_id-em-minusculas>.json`.
+
 #### Opcoes disponiveis
 
 ```bash
@@ -171,6 +217,52 @@ php bin/console app:jira:import-tasks
    - `labels`
 4. It prints a table with `external_id`, created Jira key, and per-item status.
 5. It finishes with totals for processed, success, and failures.
+
+#### JSON example to create tasks
+
+Recommended structure inside `public/JSON`:
+
+```text
+public/JSON/
+|- create-order.json
+`- issues/
+   |- task-001.json
+   `- task-002.json
+```
+
+`create-order.json`:
+
+```json
+{
+  "create_sequence": [
+    {
+      "external_id": "TASK-001",
+      "payload_file": "issues/task-001.json"
+    },
+    {
+      "external_id": "TASK-002",
+      "payload_file": "issues/task-002.json"
+    }
+  ]
+}
+```
+
+Payload example in `public/JSON/issues/task-001.json`:
+
+```json
+{
+  "jira_issue_input": {
+    "project_key": "PROJ",
+    "summary": "Implement payment endpoint",
+    "issue_type": "Task",
+    "description_text": "Create POST /payments endpoint with validations and tests.",
+    "priority": "Medium",
+    "labels": ["backend", "api", "payments"]
+  }
+}
+```
+
+> Tip: if `payload_file` is not provided, the command tries `public/JSON/issues/<external_id-lowercase>.json`.
 
 #### Available options
 
